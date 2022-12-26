@@ -24,59 +24,8 @@ class Camera:
         self.moving_speed = 0.02
         self.rotation_speed = 0.01
 
-    def control(self):
-        # get key presses to check controls
-        key = pygame.key.get_pressed()
-
-        # sprinting (fast camera movement)
-        if key[pygame.K_LSHIFT]:  # if sprinting, double speed
-            moving_speed = self.moving_speed * 2
-        else:  # if not sprinting
-            moving_speed = self.moving_speed
-
-        # forward movement
-        if key[pygame.K_w]:
-            self.position += moving_speed * self.forward
-        elif key[pygame.K_s]:
-            self.position -= moving_speed * self.forward
-
-        # right movement
-        if key[pygame.K_d]:
-            self.position += moving_speed * self.right
-        elif key[pygame.K_a]:
-            self.position -= moving_speed * self.right
-
-        # up movement
-        if key[pygame.K_SPACE]:
-            self.position += moving_speed * self.up
-        elif key[pygame.K_LCTRL]:
-            self.position -= moving_speed * self.up
-
-        # yaw movement
-        if key[pygame.K_RIGHT]:
-            self.camera_yaw(self.rotation_speed)
-        elif key[pygame.K_LEFT]:
-            self.camera_yaw(-self.rotation_speed)
-
-        # pitch movement
-        if key[pygame.K_UP]:
-            self.camera_pitch(-self.rotation_speed)
-        elif key[pygame.K_DOWN]:
-            self.camera_pitch(self.rotation_speed)
-
-    def camera_yaw(self, angle):
-        # get rotation matrix and apply to each orientation vector
-        rotation = tr.rotate_y(angle)
-        self.forward = self.forward @ rotation
-        self.right = self.right @ rotation
-        self.up = self.up @ rotation
-
-    def camera_pitch(self, angle):
-        # get rotation matrix and apply to each orientation vector
-        rotation = tr.rotate_x(angle)
-        self.forward = self.forward @ rotation
-        self.right = self.right @ rotation
-        self.up = self.up @ rotation
+        self.yaw = 0
+        self.pitch = 0
 
     def translate_matrix(self):
         '''
@@ -111,4 +60,68 @@ class Camera:
         '''
         Returns the matrix required to convert world space to camera space
         '''
+
+        self.update_orientation()
+
         return self.translate_matrix() @ self.rotate_matrix()
+
+    def control(self):
+        # get key presses to check controls
+        key = pygame.key.get_pressed()
+
+        # sprinting (fast camera movement)
+        if key[pygame.K_LSHIFT]:  # if sprinting, double speed
+            moving_speed = self.moving_speed * 2
+        else:  # if not sprinting
+            moving_speed = self.moving_speed
+
+        # forward movement
+        if key[pygame.K_w]:
+            self.position += moving_speed * self.forward
+        elif key[pygame.K_s]:
+            self.position -= moving_speed * self.forward
+
+        # right movement
+        if key[pygame.K_d]:
+            self.position += moving_speed * self.right
+        elif key[pygame.K_a]:
+            self.position -= moving_speed * self.right
+
+        # up movement
+        if key[pygame.K_SPACE]:
+            self.position += moving_speed * self.up
+        elif key[pygame.K_LCTRL]:
+            self.position -= moving_speed * self.up
+
+        # yaw movement
+        if key[pygame.K_RIGHT]:
+            self.yaw += self.rotation_speed
+        elif key[pygame.K_LEFT]:
+            self.yaw -= self.rotation_speed
+
+        # pitch movement
+        if key[pygame.K_UP]:
+            self.pitch -= self.rotation_speed
+        elif key[pygame.K_DOWN]:
+            self.pitch += self.rotation_speed
+
+    def update_orientation(self):
+        # get rotation matrix to each orientation vector
+        rotation = tr.rotate_x(self.pitch) @ tr.rotate_y(self.yaw)
+
+        # reset the vectors
+        self.reset_orientation()
+
+        # update vectors
+        self.forward = self.forward @ rotation
+        self.right = self.right @ rotation
+        self.up = self.up @ rotation
+
+    def reset_orientation(self):
+        '''
+        Resets the forward, right, up axes to their default
+        '''
+
+        self.forward = np.array([0, 0, 1, 1])
+        self.right = np.array([1, 0, 0, 1])
+        self.up = np.array([0, 1, 0, 1])
