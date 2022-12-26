@@ -47,6 +47,7 @@ class SoftwareRender:
 
             # drawing
             self.draw()
+            self.camera.control()
             pygame.display.set_caption(f'FPS: {self.clock.get_fps()}')  # set title to framerate
             pygame.display.flip()  # update screen
             self.clock.tick(self.FPS)  # set desired FPS

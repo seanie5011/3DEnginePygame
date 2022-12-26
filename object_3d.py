@@ -50,7 +50,7 @@ class Object3D:
         vertices = self.vertices @ self.render.camera.camera_matrix()  # world space to camera space
         vertices = vertices @ self.render.projection.projection_matrix  # camera space to clip space
         vertices /= vertices[:, -1].reshape(-1, 1)  # normalise clip space with respect to w, by extracting w of each and reshaping them into a compatible array before dividing (-1 means original size)
-        vertices[(vertices > 1) | (vertices < -1)] = 0  # any vertices with values greater than 1 or less than -1 are not shown, as they are out of screen (clipping)
+        vertices[(vertices > 2) | (vertices < -2)] = 0  # any vertices with values greater than 1 or less than -1 are not shown, as they are out of screen (clipping) {CHANGED TO 2 FOR A JANKY FIX TO CLIPPING}
         vertices = vertices @ self.render.projection.screen_matrix  # convert normalised clip space to screen space
         vertices = vertices[:, :2]  # only keep (x,y) coords of each vertex in this space
 

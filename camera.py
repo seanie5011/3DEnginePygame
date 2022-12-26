@@ -20,6 +20,64 @@ class Camera:
         self.near_plane = 0.1  # arbitrarily set
         self.far_plane = 100
 
+        # movement
+        self.moving_speed = 0.02
+        self.rotation_speed = 0.01
+
+    def control(self):
+        # get key presses to check controls
+        key = pygame.key.get_pressed()
+
+        # sprinting (fast camera movement)
+        if key[pygame.K_LSHIFT]:  # if sprinting, double speed
+            moving_speed = self.moving_speed * 2
+        else:  # if not sprinting
+            moving_speed = self.moving_speed
+
+        # forward movement
+        if key[pygame.K_w]:
+            self.position += moving_speed * self.forward
+        elif key[pygame.K_s]:
+            self.position -= moving_speed * self.forward
+
+        # right movement
+        if key[pygame.K_d]:
+            self.position += moving_speed * self.right
+        elif key[pygame.K_a]:
+            self.position -= moving_speed * self.right
+
+        # up movement
+        if key[pygame.K_SPACE]:
+            self.position += moving_speed * self.up
+        elif key[pygame.K_LCTRL]:
+            self.position -= moving_speed * self.up
+
+        # yaw movement
+        if key[pygame.K_RIGHT]:
+            self.camera_yaw(self.rotation_speed)
+        elif key[pygame.K_LEFT]:
+            self.camera_yaw(-self.rotation_speed)
+
+        # pitch movement
+        if key[pygame.K_UP]:
+            self.camera_pitch(-self.rotation_speed)
+        elif key[pygame.K_DOWN]:
+            self.camera_pitch(self.rotation_speed)
+
+    def camera_yaw(self, angle):
+        # get rotation matrix and apply to each orientation vector
+        rotation = tr.rotate_y(angle)
+        self.forward = self.forward @ rotation
+        self.right = self.right @ rotation
+        self.up = self.up @ rotation
+
+    def camera_pitch(self, angle):
+        # get rotation matrix and apply to each orientation vector
+        rotation = tr.rotate_x(angle)
+        self.forward = self.forward @ rotation
+        self.right = self.right @ rotation
+        self.up = self.up @ rotation
+
     def translate_matrix(self):
         '''
         Returns the translation required for world space to camera space
