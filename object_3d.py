@@ -1,6 +1,14 @@
 import pygame
 import numpy as np
 import transformations as tr
+from numba import jit
+
+@jit(nopython=True, fastmath=True)
+def any_func(arr, a, b):
+    '''
+    Check if any arr is in a or b
+    '''
+    return np.any((arr == a) | (arr == b))
 
 class Object3D_preset:  # for using models that are hardcoded
     def __init__(self, render, model, draw_vertices=True):
@@ -49,13 +57,13 @@ class Object3D_preset:  # for using models that are hardcoded
         # draw edges of each face as lines from a polygon
         for face in self.faces:
             polygon = vertices[face]
-            if not np.any((polygon == self.render.WIDTH // 2) | (polygon == self.render.HEIGHT // 2)):  # when a vertex is 0 (not shown) in normalised clip space, it is set equal to either half-width or half-height in screen space
+            if not any_func(polygon, self.render.WIDTH // 2, self.render.HEIGHT // 2):  # when a vertex is 0 (not shown) in normalised clip space, it is set equal to either half-width or half-height in screen space
                 pygame.draw.polygon(self.render.screen, pygame.Color('orange'), polygon, 2)  # screen, color, vertices, width
 
         if self.draw_vertices:
             # draw vertices as points
             for vertex in vertices:
-                if not np.any((vertex == self.render.WIDTH // 2) | (vertex == self.render.HEIGHT // 2)):  # when a vertex is 0 (not shown) in normalised clip space, it is set equal to either half-width or half-height in screen space
+                if not any_func(vertex, self.render.WIDTH // 2, self.render.HEIGHT // 2):  # when a vertex is 0 (not shown) in normalised clip space, it is set equal to either half-width or half-height in screen space
                     pygame.draw.circle(self.render.screen, pygame.Color('white'), vertex, 4)  # screen, color, vertices, width
 
     # projections
@@ -111,13 +119,13 @@ class Object3D:  # same as above except now use custom vertices and faces
         # draw edges of each face as lines from a polygon
         for face in self.faces:
             polygon = vertices[face]
-            if not np.any((polygon == self.render.WIDTH // 2) | (polygon == self.render.HEIGHT // 2)):  # when a vertex is 0 (not shown) in normalised clip space, it is set equal to either half-width or half-height in screen space
+            if not any_func(polygon, self.render.WIDTH // 2, self.render.HEIGHT // 2):  # when a vertex is 0 (not shown) in normalised clip space, it is set equal to either half-width or half-height in screen space
                 pygame.draw.polygon(self.render.screen, pygame.Color('orange'), polygon, 2)  # screen, color, vertices, width
 
         if self.draw_vertices:
             # draw vertices as points
             for vertex in vertices:
-                if not np.any((vertex == self.render.WIDTH // 2) | (vertex == self.render.HEIGHT // 2)):  # when a vertex is 0 (not shown) in normalised clip space, it is set equal to either half-width or half-height in screen space
+                if not any_func(vertex, self.render.WIDTH // 2, self.render.HEIGHT // 2):  # when a vertex is 0 (not shown) in normalised clip space, it is set equal to either half-width or half-height in screen space
                     pygame.draw.circle(self.render.screen, pygame.Color('white'), vertex, 4)  # screen, color, vertices, width
 
     # projections
